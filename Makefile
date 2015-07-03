@@ -8,4 +8,4 @@ engine:
 	clang -o engine obj/main.o obj/instance.o obj/class.o obj/script.o -I/usr/include/ -L/usr/local/lib/ -llua -I/usr/include/ 
 
 clean:
-	rm -f engine
+	rm -f engine obj/*.o

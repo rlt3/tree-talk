@@ -18,13 +18,17 @@ struct Instance
 {
   int id;
   int class_id;
+
   int component_count;
   Script components[MAX_COMPONENTS];
+
+  int child_count;
+  struct Instance * children[MAX_COMPONENTS];
 };
 
 struct Instance * instance_get_by_id (int);
 
 /* Attempt to create instance. 0 return is successful, 1 is error. */
-int instance_create (int, int, Script *);
+int instance_create (int, int, int, Script *);
 
 #endif
