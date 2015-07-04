@@ -24,8 +24,8 @@ int instance_create (int parent_id, int class_id, int count, Script *comps)
 
   memcpy(instances[i_index].components, comps, count * sizeof comps);
 
-  memset(instances[i_index].children, 0, 
-      MAX_COMPONENTS * sizeof(struct Instance *));
+  //memset(instances[i_index].children, 0, 
+  //    MAX_COMPONENTS * sizeof(struct Instance *));
 
   struct Instance * parent;
 
@@ -40,4 +40,18 @@ int instance_create (int parent_id, int class_id, int count, Script *comps)
   i_index++;
 
   return 0;
+}
+
+void instances_destroy()
+{
+  struct Instance * ins;
+
+  int i, j;
+  for (i = 0; i < i_index; i++) {
+    ins = &instances[i];
+
+    for (j = 0; j < ins->component_count; j++) {
+      lua_close(ins->components[j]);
+    }
+  }
 }

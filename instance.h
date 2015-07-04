@@ -28,7 +28,9 @@ struct Instance
 
 struct Instance * instance_get_by_id (int);
 
-/* Attempt to create instance. 0 return is successful, 1 is error. */
+/* Attempt to create instance. 0 return is succesful, 1 is too many instances */
 int instance_create (int, int, int, Script *);
+
+void instances_destroy();
 
 #endif

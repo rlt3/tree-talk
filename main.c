@@ -2,7 +2,7 @@
 #include "script.h"
 #include "class.h"
 
-void print() 
+void print_class() 
 {
   int id = 0;
   struct Class * class = class_get_by_id(id);
@@ -29,7 +29,7 @@ int main (void)
   script_load_classes(config);
   script_load_tree(config);
 
-  print();
+  print_class();
 
   script_destroy(config);
 

@@ -52,7 +52,7 @@ void script_set_table (Script S, const char *name)
   lua_getglobal(S, name);
 
   if (!lua_istable(S, -1))
-    script_bail (S, "'%d' is not a table", name);
+    script_bail (S, "'%s' is not a table", name);
 }
 
 const char * script_get_table_field (Script S, const char *key)
@@ -142,13 +142,15 @@ void script_load_classes (Script S)
 
 void script_load_tree (Script S)
 {
-  const char * name;
-  const char * script_files[MAX_CLASSES];
+  Script scripts[MAX_CLASSES];
+  int env_index = 0;
+  int class_id;
+
+  struct Class *class;
 
   int element_index = 1;
 
-  const char *key;
-  int value;
+  int x, y;
 
   /* setup table */
   script_set_table(S, "tree");
@@ -160,25 +162,87 @@ void script_load_tree (Script S)
   while (lua_next(S, -2)) {
 
     if (!lua_istable(S, -1))
-      script_bail (S, 
-          "Element %d of table `tree' is not a table!\n",
+      script_bail (S, "Element %d of table `tree' is not a table!\n",
           element_index);
 
-    /* each table has no key */
+    lua_pushstring(S, "class");
+    lua_gettable(S, -2);
+
+    class_id = lua_tointeger(S, -1);
+
+    lua_pop(S, 1);
+
+    /* get the table where that's named `components' */
+    lua_pushstring(S, "envs");
+    lua_gettable(S, -2);
+
+    if (!lua_istable(S, -1))
+      script_bail (S, "envs is not a table in element %d!\n", element_index);
+
+    /* each component has no key */
     lua_pushnil(S);
 
     /* go through each component */
     while (lua_next(S, -2)) {
 
-      key   = lua_tostring(S, -2);
-      value = (int)lua_tonumber(S, -1);
+      if (!lua_istable(S, -1))
+        script_bail (S, 
+          "Env %d of Element %d of table `tree' is not a table!\n",
+          env_index, element_index);
 
-      printf("%s => %d\n", key, value);
+      /* need some way to push this environment to be loaded when the script
+       * is loaded into memory. need some sort of key => value map that can
+       * work with multiple data types. maybe only int now for prototype
+       */
+
+      /* get our x and y values */
+      lua_pushstring(S, "x");
+      lua_gettable(S, -2);
+      x = (int) lua_tonumber(S, -1);
+      lua_pop(S, 1);
+
+      lua_pushstring(S, "y");
+      lua_gettable(S, -2);
+      y = (int) lua_tonumber(S, -1);
+      lua_pop(S, 1);
+
+      /* get our class reference */
+      class = class_get_by_id(class_id);
+
+      /* create a new lua state and push our environment */
+      Script N = luaL_newstate();
+      luaL_openlibs(N);
+
+      lua_pushnumber(N, x); 
+      lua_setglobal(N, "x");
+
+      lua_pushnumber(N, y); 
+      lua_setglobal(N, "y");
+
+      /* load the file from the specifc script in the class reference */
+      if (luaL_loadfile(N, class->component_files[env_index]) || 
+          lua_pcall(N, 0, 0, 0))
+        script_bail (N, "Can't load %s into memory\n", 
+            class->component_files[env_index]);
+
+      /* test everything out and then destroy it, we're not saving now */
+      lua_getglobal(N, "message");  /* function to be called */
+      if (lua_pcall(N, 0, 0, 0) != 0)
+        script_bail (N, "Error calling function: %s", "message");
+
+      lua_close(N);
+
+      //scripts[env_index] = N;
+
+      // printf("Env %d (class %d) of element %d: { x => %d, y => %d }\n", 
+      //     env_index, class_id, element_index, x, y);
 
       lua_pop(S, 1);
+      env_index++;
     }
 
-    lua_pop(S, 1);
     element_index++;
+    env_index = 0;
+    lua_pop(S, 2);
   }
 }
