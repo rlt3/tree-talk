@@ -55,7 +55,7 @@ void script_set_table (Script S, const char *name)
     script_bail (S, "'%d' is not a table", name);
 }
 
-char * script_get_table_field (Script S, const char *key)
+const char * script_get_table_field (Script S, const char *key)
 {
   lua_pushstring(S, key);
   lua_gettable(S, -2);
@@ -63,7 +63,7 @@ char * script_get_table_field (Script S, const char *key)
   if (!lua_isstring(S, -1))
     script_bail (S, "invalid field in table for key: %s", key);
 
-  char *result = strdup(lua_tostring(S, -1));
+  const char *result = lua_tostring(S, -1);
 
   lua_pop(S, 1); // pop our key field so top of stack is table
 
@@ -76,15 +76,13 @@ void script_destroy (Script S)
   S = NULL;
 }
 
-void script_load_classes (const char *filename)
+void script_load_classes (Script S)
 {
-  char * name;
-  char * script_files[MAX_CLASSES];
+  const char * name;
+  const char * script_files[MAX_CLASSES];
 
   int element_index = 0;
   int script_index = 0;
-
-  Script S = load_script_into_memory(filename);
 
   /* setup table */
   script_set_table(S, "classes");
@@ -123,7 +121,7 @@ void script_load_classes (const char *filename)
             script_index, element_index);
 
       /* add the component file to our index and increment the index */
-      script_files[script_index++] = strdup(lua_tostring(S, -1));
+      script_files[script_index++] = lua_tostring(S, -1);
 
       /* pop current to move to next */
       lua_pop(S, 1);
@@ -140,21 +138,17 @@ void script_load_classes (const char *filename)
     element_index++;
     script_index = 0;
   }
-
-  script_destroy(S);
 }
 
-void script_load_tree (const char *filename)
+void script_load_tree (Script S)
 {
-  char * name;
-  char * script_files[MAX_CLASSES];
+  const char * name;
+  const char * script_files[MAX_CLASSES];
 
   int element_index = 1;
 
-  char *key;
+  const char *key;
   int value;
-
-  Script S = load_script_into_memory(filename);
 
   /* setup table */
   script_set_table(S, "tree");
@@ -176,7 +170,7 @@ void script_load_tree (const char *filename)
     /* go through each component */
     while (lua_next(S, -2)) {
 
-      key   = strdup(lua_tostring(S, -2));
+      key   = lua_tostring(S, -2);
       value = (int)lua_tonumber(S, -1);
 
       printf("%s => %d\n", key, value);
@@ -184,11 +178,7 @@ void script_load_tree (const char *filename)
       lua_pop(S, 1);
     }
 
-    free (key);
-
     lua_pop(S, 1);
     element_index++;
   }
-
-  script_destroy(S);
 }

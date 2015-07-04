@@ -13,7 +13,7 @@ struct Class * class_get_by_id (int id)
   return &classes[id];
 }
 
-int class_create (char *name, int count, char **files)
+int class_create (const char *name, int count, const char **files)
 {
   if (c_index + 1 >= MAX_CLASSES)
     return 1;

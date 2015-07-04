@@ -16,8 +16,8 @@
 struct Class
 {
   int component_count;
-  char *name;
-  char *component_files[MAX_COMPONENTS];
+  const char *name;
+  const char *component_files[MAX_COMPONENTS];
 };
 
 struct Class * class_get_by_id (int);
@@ -26,6 +26,6 @@ struct Class * class_get_by_id (int);
  * create class from char array, int, and files. 0 return is successful, 1 is
  * error.
  */
-int class_create (char*, int, char **);
+int class_create (const char*, int, const char **);
 
 #endif

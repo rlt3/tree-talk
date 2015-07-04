@@ -1,9 +1,6 @@
 #include "instance.h"
 
-static struct Instance head = {
-  .id = -1, .class_id = -1, .component_count = 0, .child_count = 0
-};
-
+static struct Instance head;
 static struct Instance instances[MAX_CLASSES];
 static int i_index = 0;
 

@@ -24,25 +24,14 @@ void print()
 
 int main (void)
 {
-  script_load_classes("load.lua");
-  script_load_tree("load.lua");
+  Script config = load_script_into_memory("load.lua");
+
+  script_load_classes(config);
+  script_load_tree(config);
 
   print();
 
-  int id = 0;
-  struct Class * class = class_get_by_id(id);
-
-  while (class != NULL) {
-    int i;
-    for (i = 0; i < class->component_count; i++) {
-      free(class->component_files[i]);
-    }
-
-    free(class->name);
-
-    id++;
-    class = class_get_by_id(id);
-  }
+  script_destroy(config);
 
   return 0;
 }
