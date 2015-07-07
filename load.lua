@@ -4,6 +4,11 @@ classes = {
 };
 
 tree = {
-  { parent = -1, class = 0, envs = { { x = 15, y = 850} } },
-  { parent = -1, class = 1, envs = { {y = 908, x = 45} } }
+  { parent = -1, components = { { script = "draw.lua", env = {x = 15, y = 850} } } },
+  { parent = -1, components = { { script = "draw.lua", env = {y = 908, x = 45} } } }
+};
+
+cool = {
+  {x = 15, y = 850, sprite = "player.png"},
+  {y = 908, x = 45, sprite = "five"}
 };

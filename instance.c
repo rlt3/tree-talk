@@ -1,57 +1,110 @@
 #include "instance.h"
+#include <string.h>
 
-static struct Instance head;
-static struct Instance instances[MAX_CLASSES];
-static int i_index = 0;
+#define CREATE 1
+#define QUERY 0
 
-struct Instance * instance_get_by_id (int id)
+/*
+ * Single entry point for our statically allocated instances.
+ */
+Instance * instances()
 {
-  if (id >= i_index)
-    return NULL;
-
-  return &instances[id];
+  static Instance instances[MAX_INSTANCES];
+  return instances;
 }
 
-int instance_create (int parent_id, int class_id, int count, Script *comps)
+/*
+ * Returns the current index. If QUERYing, leaves index alone. Increments the
+ * index if CREATEing. Index starts at 1 because 0 is reserved for the head of
+ * tree.
+ */
+int instance_index (int do_increment)
 {
-  if (i_index + 1 >= MAX_CLASSES)
-    return 1;
+  static int index = 1;
+  return (do_increment ? index++ : index);
+}
 
-  instances[i_index].id = i_index;
-  instances[i_index].class_id = class_id;
-  instances[i_index].component_count = count;
-  instances[i_index].child_count = 0;
+/*
+ * Get current index, which also serves as the count.
+ */
+int instance_count ()
+{
+  return instance_index(QUERY);
+}
 
-  memcpy(instances[i_index].components, comps, count * sizeof comps);
+/*
+ * Get a pointer to a particular instance, NULL if given invalid id.
+ */
+Instance * instance_by_id (int id)
+{
+  if (id >= instance_index(QUERY))
+    return NULL;
 
-  //memset(instances[i_index].children, 0, 
-  //    MAX_COMPONENTS * sizeof(struct Instance *));
+  return &instances()[id];
+}
 
-  struct Instance * parent;
+/*
+ * In a While != NULL loop, loop through each component of an instance.
+ */
+Component * instance_each_component(Instance *ins)
+{
+  static int index = 0;
 
-  if (parent_id == -1) {
-    parent = &head;
-  } else {
-    parent = instance_get_by_id(parent_id);
+  if (index >= ins->component_count) {
+    index = 0;
+    return NULL;
   }
 
-  parent->children[parent->child_count++] = &instances[i_index];
+  return &ins->components[index++];
+}
 
-  i_index++;
+/*
+ * In a While != NULL loop, loop through each child of an instance.
+ */
+Instance * instance_each_child(Instance *ins)
+{
+  static int index = 0;
+
+  if (index >= ins->child_count) {
+    index = 0;
+    return NULL;
+  }
+
+  return ins->children[index++];
+}
+
+/*
+ * Create the instance. Returns 0 if no problems, 1 otherwise.
+ */
+int instance_create (const char *name, int pid, int count)
+{
+  if (instance_count() + 1 >= MAX_INSTANCES)
+    return 1;
+
+  Instance * ins = instance_by_id(instance_index(CREATE));
+
+  ins->id              = instance_count();
+  ins->name            = name;
+  ins->parent_id       = pid;
+  ins->component_count = count;
+  ins->child_count     = 0;
+
+  Instance * parent = instance_by_id(pid);
+
+  parent->children[parent->child_count++] = ins;
 
   return 0;
 }
 
-void instances_destroy()
+/*
+ * Add a component to a given instance.
+ */
+int instance_add_component (Instance *ins, Component c)
 {
-  struct Instance * ins;
+  if (ins->component_count + 1 >= MAX_COMPONENTS)
+    return 1;
 
-  int i, j;
-  for (i = 0; i < i_index; i++) {
-    ins = &instances[i];
+  ins->components[ins->component_count++] = c;
 
-    for (j = 0; j < ins->component_count; j++) {
-      lua_close(ins->components[j]);
-    }
-  }
+  return 0;
 }
