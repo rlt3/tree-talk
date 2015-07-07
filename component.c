@@ -1,10 +1,27 @@
 #include "component.h"
 #include <string.h>
 
-Component component_create(const char* filename, int varc, Variable *vars)
+int component_message(Component *c, const char *message)
+{
+  return (script_call_function(c->script, message) ? 1 : 0);
+}
+
+void component_destroy(Component *c)
+{
+  script_destroy(c->script);
+}
+
+int component_create(Component *cmp, 
+    const char* filename, 
+    int varc, 
+    Variable *vars)
 {
   Script S = script_new();
-  script_load(S, filename);
+
+  if (script_load(S, filename)) {
+    script_destroy(S);
+    return 1;
+  }
 
   Variable var;
 
@@ -38,10 +55,9 @@ Component component_create(const char* filename, int varc, Variable *vars)
     }
   }
 
-  Component cmp;
-  cmp.filename = filename;
-  cmp.script = S;
-  memcpy(cmp.variables, vars, varc * sizeof(vars));
+  cmp->filename = filename;
+  cmp->script = S;
+  memcpy(cmp->variables, vars, varc * sizeof(vars));
 
-  return cmp;
+  return 0;
 }

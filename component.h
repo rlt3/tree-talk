@@ -34,10 +34,25 @@ typedef struct Variable Variable;
  * `low-level' script.h functions being used above this level (or at this tier
  * for other files).
  */
-
-int component_message(Component *c);
+int component_message(Component *c, const char *message);
 int component_reload(Component *c);
 
-Component component_create(const char* filename, int varc, Variable *vars);
+/*
+ * Cleanup our component.
+ */
+void component_destroy(Component *c);
+
+
+/*
+ * Since we don't have a statically allocated array like Components, we would
+ * like to return by copy. But we need to error check. Pass in a pointer to an
+ * empty component and fill it in.
+ *
+ * Returns 0 if OK, 1 if problems.
+ */
+int component_create(Component *c, 
+    const char* filename, 
+    int varc, 
+    Variable *vars);
 
 #endif

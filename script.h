@@ -11,10 +11,10 @@ Script script_new ();
 
 void script_bail (Script S, const char *fmt, ...);
 void script_destroy (Script S);
-void script_create_tree (Script S);
 
 /* return 0 if no errors, 1 if errors */
 int script_load (Script S, const char *filename);
+int script_call_function (Script S, const char *function);
 
 void script_set_int(Script S, const char *name, int value);
 void script_set_float(Script S, const char *name, float value);

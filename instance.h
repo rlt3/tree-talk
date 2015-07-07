@@ -49,11 +49,16 @@ Instance * instance_each_child(Instance *ins);
 /*
  * Create the instance. Returns 0 if no problems, 1 otherwise.
  */
-int instance_create (const char *, int, int);
+Instance * instance_create (const char *, int);
 
 /*
  * Add a component to a given instance.
  */
 int instance_add_component (Instance *ins, Component c);
+
+/*
+ * Cleanup our components for each instance.
+ */
+void instances_cleanup ();
 
 #endif

@@ -31,6 +31,12 @@ int script_load (Script S, const char *filename)
   return (luaL_loadfile(S, filename) || lua_pcall(S, 0, 0, 0)) ? 1 : 0;
 }
 
+int script_call_function (Script S, const char *function)
+{
+  lua_getglobal(S, function);  /* function to be called */
+  return (lua_pcall(S, 0, 0, 0) ? 1 : 0);
+}
+
 void script_set_int(Script S, const char *name, int value)
 {
   lua_pushnumber(S, value); 

@@ -76,24 +76,24 @@ Instance * instance_each_child(Instance *ins)
 /*
  * Create the instance. Returns 0 if no problems, 1 otherwise.
  */
-int instance_create (const char *name, int pid, int count)
+Instance * instance_create (const char *name, int pid)
 {
   if (instance_count() + 1 >= MAX_INSTANCES)
-    return 1;
+    return NULL;
 
   Instance * ins = instance_by_id(instance_index(CREATE));
 
   ins->id              = instance_count();
   ins->name            = name;
   ins->parent_id       = pid;
-  ins->component_count = count;
   ins->child_count     = 0;
+  ins->component_count = 0;
 
   Instance * parent = instance_by_id(pid);
 
   parent->children[parent->child_count++] = ins;
 
-  return 0;
+  return ins;
 }
 
 /*
@@ -107,4 +107,20 @@ int instance_add_component (Instance *ins, Component c)
   ins->components[ins->component_count++] = c;
 
   return 0;
+}
+
+/*
+ * Cleanup our components for each instance.
+ */
+void instances_cleanup ()
+{
+  Instance * ins;
+  int i, j;
+  for (i = 0; i < instance_count(); i++) {
+    ins = instance_by_id(i);
+
+    for (j = 0; j < ins->component_count; j++) {
+      component_destroy(&ins->components[j]);
+    }
+  }
 }
