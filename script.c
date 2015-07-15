@@ -37,6 +37,14 @@ int script_call_function (Script S, const char *function)
   return (lua_pcall(S, 0, 0, 0) ? 1 : 0);
 }
 
+void script_set_cfunction (Script S, 
+    int (*function)(lua_State*), 
+    const char *name)
+{
+  lua_pushcfunction(S, function);
+  lua_setglobal(S, name);  
+}
+
 void script_set_int(Script S, const char *name, int value)
 {
   lua_pushnumber(S, value); 

@@ -6,6 +6,7 @@
 #include <lualib.h>
 
 typedef lua_State* Script;
+typedef int (*CFunctionPtr) (Script S);
 
 Script script_new ();
 
@@ -16,6 +17,16 @@ void script_destroy (Script S);
 int script_load (Script S, const char *filename);
 int script_call_function (Script S, const char *function);
 
+/* 
+ * Register a C function with lua
+ */
+void script_set_cfunction(Script S, 
+    int (*function)(lua_State*), 
+    const char *name);
+
+/*
+ * Set various types of data to a variable with the name given.
+ */
 void script_set_int(Script S, const char *name, int value);
 void script_set_float(Script S, const char *name, float value);
 void script_set_string(Script S, const char *name, const char *value);
