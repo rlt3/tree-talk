@@ -31,7 +31,7 @@ those definitions to define their meaning.
 
 (defun parse-each-side (form side procedure)
     "Call a procedure on every element on one side of the object."
-    (if (not (car (funcall side tree)))
+    (if (not (car (funcall side form)))
         ()
         (mapcar
             procedure
