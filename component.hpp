@@ -9,18 +9,31 @@ extern "C" {
 #include <map>
 #include <string>
 
-enum ScriptTypes {
+union ScriptData
+{
+  int i;
+  float f;
+  const char *s;
+
+  ScriptData (int v) : i(v) { }
+  ScriptData (float v) : f(v) { }
+  ScriptData (const char *v) : s(v) { }
+};
+
+enum ScriptTypes
+{
   t_int, t_float, t_string, t_bool, t_null
 };
 
-struct Variable {
+struct Variable
+{
   const char *name;
   enum ScriptTypes type;
-  union {
-    int i;
-    float f;
-    const char *s;
-  } value;
+  ScriptData value;
+
+  Variable (const char* n, int v) : name(n), type(t_int), value(v) { }
+  Variable (const char* n, float v) : name(n), type(t_float), value(v) { }
+  Variable (const char* n, const char *v) : name(n), type(t_string), value(v) { }
 };
 
 class Component
@@ -29,10 +42,11 @@ protected:
   static std::map<std::string, CFunctionPtr> cfunctions;
 
   std::vector<Variable> variables;
-  std::string filename;
   Script script;
 
 public:
+  std::string filename;
+
   Component(std::string f) : filename(f) { }
 
   /*
@@ -45,6 +59,11 @@ public:
    * Set (or create) a variable for this component's script. 
    */
   void add_env_var (Variable var);
+
+  /*
+   * Remove all the environment variables.
+   */
+  void clear_env_vars ();
 
   /*
    * Attempt to load the component with the given environment and C functions.

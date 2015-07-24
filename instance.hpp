@@ -6,7 +6,11 @@
 
 class Instance 
 {
+private:
   static int count;
+
+protected:
+  void destroy_components();
 
 public: 
   int id;
@@ -19,9 +23,18 @@ public:
   Instance (std::string s);
   ~Instance();
 
-  void message (int sender_id, std::string message);
-  void add_component (Component c);
-  void add_child (Instance *ins);
+  Instance& message (int sender_id, std::string message);
+  Instance& add_component (Component c);
+  Instance& add_child (Instance *ins);
+
+  Instance& clear_components ();
+
+//template<typename Lambda>
+//void each_component (Lambda f)
+//{
+//  for (Component &c : components)
+//    f(components);
+//}
 };
 
 #endif

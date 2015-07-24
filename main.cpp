@@ -1,34 +1,45 @@
 #include "instance.hpp"
+#include "aligned_storage.hpp"
 
-Variable make_var (const char *name, int val)
-{
-  Variable var;
-
-  var.type = t_int;
-  var.name = name;
-  var.value.i = val;
-  
-  return var;
-}
+#include <stdio.h>
 
 int main (void)
 {
-  Instance ins("test");
-
   Component c1("draw.lua");
-  c1.add_env_var(make_var("x", 600));
-  c1.add_env_var(make_var("y", 800));
+  c1.add_env_var(Variable("x", 600));
+  c1.add_env_var(Variable("y", 800));
   c1.load();
 
   Component c2("draw.lua");
-  c2.add_env_var(make_var("x", 1));
-  c2.add_env_var(make_var("y", 3));
+  c2.add_env_var(Variable("x", 1));
+  c2.add_env_var(Variable("y", 3));
   c2.load();
 
-  ins.add_component(c1);
-  ins.add_component(c2);
+  AlignedStorage<Instance, 20> instances;
 
-  ins.message(1, "message");
+  Instance &head = instances.add("head");
+
+  head
+    .add_component(c1)
+    .add_component(c2)
+    .message(1, "message");
+
+  head.components[0].clear_env_vars();
+  head.components[1].clear_env_vars();
+
+  head.components[0].add_env_var(Variable("x", 20));
+  head.components[0].add_env_var(Variable("y", "milllion"));
+  head.components[0].load();
+
+  head.components[1].add_env_var(Variable("x", 1818));
+  head.components[1].add_env_var(Variable("y", 9191));
+  head.components[1].load();
+
+  head.message(1, "message");
+
+  //instances.last().each_component([] (Component &c) {
+  //  printf("%s\n", c.filename.c_str());
+  //});
 
   return 0;
 }

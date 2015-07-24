@@ -7,6 +7,11 @@ void Component::add_env_var (Variable var)
   variables.push_back(var);
 }
 
+void Component::clear_env_vars ()
+{
+  variables.clear();
+}
+
 /*
  * Set the sender and send a message.
  */

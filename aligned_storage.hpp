@@ -11,13 +11,14 @@ class AlignedStorage
 public:
   /* create an object by passing params as if you were constructing normally */
   template<typename ...Args> 
-  void add(Args&&... args) 
+  T& add(Args&&... args) 
   {
     if (m_size >= N)
       throw std::bad_alloc { };
 
     new (data+m_size) T(std::forward<Args>(args)...);
     ++m_size;
+    return (*this)[m_size];
   }
 
   /* pass each object to the lambda */
@@ -26,6 +27,11 @@ public:
   {
     for (std::size_t m = 0; m < m_size; m++)
       f((*this)[m]);
+  }
+
+  T& last ()
+  {
+    return (*this)[m_size];
   }
 
   /* get object in aligned storage by the subscript operator */
