@@ -1,15 +1,5 @@
 (load "message.lisp")
 
-(defun apply-message (procedure message-type data-list)
-    "A common form I've seen crop up with handling message data."
-    (lambda (some-obj)
-        (apply procedure
-            (append (list some-obj message-type) data-list))))
-
-(defun private-property (object property-symbol)
-    "Clarity function for private property access in classes."
-    (slot-value object property-symbol))
-
 (defclass leaf ()
    ((filename  :reader leaf-filename 
                :initform "default"

@@ -10,9 +10,10 @@
 
 (defmethod tree-message ((self branch) (msg message))
     "Send a message to the entire tree."
-    (branch-message self msg)
-    (branch-each-child self 
-        (lambda (b) (tree-message b msg))))
+    (list 
+        (branch-message self msg)
+        (branch-each-child self 
+            (lambda (b) (tree-message b msg)))))
 
 (defun make-tree (serialized-tree)
     "Create and return the head of a tree from a serialized tree."
@@ -24,7 +25,6 @@
     "Ease-of-use function that automatically makes a message object for us."
     (tree-message branch (make-message branch author message-type data)))
 
-;
 ;   TODO:
 ;       * Need to create our `talk' procedures, e.g. reply, command, think
 ;       * We only want our tree to load every script file once even if it
@@ -33,3 +33,17 @@
 (defvar tree (make-tree tree-structure))
 (defvar branch (car (branch-children tree)))
 (defvar leaf (make-leaf "draw.lisp" 'draw '(:x 800 :y 600)))
+
+(defun start ()
+    (message-tree tree branch 'update))
+
+(defun output ()
+    (branch-serialize branch))
+
+(defun test ()
+    (make-tree (branch-serialize branch)))
+
+(defun reload ()
+    (load "tree.lisp"))
+
+(tree-load! tree)

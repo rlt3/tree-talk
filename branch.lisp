@@ -38,16 +38,8 @@
     "Load the leaves of an branch."
     (branch-each-leaf self #'leaf-load!))
 
-(defmethod branch-serialize ((self branch)))
-  ; is an branch a list of its children or just the leaves ? 
-
-(defmethod serialize-tree ((self branch))
-    "Serialize our tree so that it may be reloaded later."
-    (list
-        (list
-            (mapcar #'leaf-serialize (branch-leaves self))
-            (list 
-                (mapcar
-                    #'serialize-tree
-                    (branch-children self))))))
-
+(defmethod branch-serialize ((self branch))
+    "Serialize the branch and it's children if any."
+    (list 
+        (branch-each-leaf self #'leaf-serialize)
+        (branch-each-child self #'branch-serialize)))
