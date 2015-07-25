@@ -31,15 +31,9 @@
 
 (defmethod branch-message ((self branch) (msg message))
     "Message the leaves of this branch."
-    (branch-each-leaf self
-        (lambda (l) (leaf-message l msg))))
+    (message-set-sender! msg self)
+    (branch-each-leaf self (lambda (l) (leaf-message l msg))))
 
 (defmethod branch-load! ((self branch))
     "Load the leaves of an branch."
     (branch-each-leaf self #'leaf-load!))
-
-(defmethod branch-serialize ((self branch))
-    "Serialize the branch and it's children if any."
-    (list 
-        (branch-each-leaf self #'leaf-serialize)
-        (branch-each-child self #'branch-serialize)))

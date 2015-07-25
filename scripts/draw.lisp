@@ -13,13 +13,13 @@
 ;; You can start the sequence from something like 'start on a separate 
 ;; script.
 
-(defmethod update ((self draw))
+(defmethod update ((self draw) (msg message))
     (format t "Drawing at (~D, ~D)~%" (draw-x self) (draw-y self)))
 
-(defmethod location ((self draw) x y)
+(defmethod location ((self draw) (msg message) x y)
     (_move self x y))
 
-(defmethod _move ((self draw) a b)
+(defmethod _move ((self draw) (msg message) a b)
     "(x + a, y + b) => (x, y)"
     (setf (draw-x self) (+ (draw-x self) a))
     (setf (draw-y self) (+ (draw-y self) b))

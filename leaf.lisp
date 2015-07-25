@@ -17,6 +17,7 @@
 
 (defmethod leaf-message ((self leaf) (msg message))
     "Message the leaf."
+    ;(message-send-to msg (private-property self 'object)))
     (handler-case
         (message-send-to msg (private-property self 'object))
         (condition (e) self))
