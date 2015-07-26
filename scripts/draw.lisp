@@ -19,7 +19,7 @@
 (defmethod location ((self draw) (msg message) x y)
     (_move self x y))
 
-(defmethod _move ((self draw) (msg message) a b)
+(defmethod _move ((self draw) a b)
     "(x + a, y + b) => (x, y)"
     (setf (draw-x self) (+ (draw-x self) a))
     (setf (draw-y self) (+ (draw-y self) b))

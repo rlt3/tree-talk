@@ -28,13 +28,9 @@
 
 (defvar tree (make-tree tree-structure))
 (defvar branch (car (branch-children tree)))
-(defvar leaf (make-leaf "draw.lisp" 'draw '(:x 800 :y 600)))
+(defvar leaf (car (branch-leaves branch)))
 
-(defun query ()
-    (message-tree tree 'update))
-
-(defun add ()
-    (message-tree tree 'location 11 11))
+(defvar start-msg (make-message branch branch 'start ()))
 
 (defun reload ()
     (load "tree.lisp"))

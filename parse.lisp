@@ -3,9 +3,9 @@
         (list ())
         (list
             (list
-                (list '("collision.lisp" collision ())
-                      '("draw.lisp" draw (:x 10 :y 15))
-                      '("debug.lisp" deboog ()))
+                (list '("debug.lisp" deboog ())
+                      '("collision.lisp" collision ())
+                      '("draw.lisp" draw (:x 10 :y 15)))
                 (list 
                     (list 
                         (list '("collision.lisp" collision ())
@@ -16,13 +16,13 @@
                       '("draw.lisp" draw (:x 40 :y 80)))
                 (list ())))))
 
-#| 
+#||
  
   The form of our data structure is ( () () ). So, it is a list that has two
 lists inside. Knowing this, we can define how to get to each `side' and use
 those definitions to define their meaning.
 
-|#
+||#
 
 (defun parse-left (form)
     (car form))
