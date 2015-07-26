@@ -31,7 +31,7 @@
 
 (defmethod branch-message ((self branch) (msg message))
     "Message the leaves of this branch."
-    (message-set-sender! msg self)
+    ;(message-set-sender! msg self)
     (branch-each-leaf self (lambda (l) (leaf-message l msg))))
 
 (defmethod branch-load! ((self branch))

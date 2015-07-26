@@ -44,8 +44,12 @@
 (defvar branch (car (branch-children tree)))
 (defvar leaf (make-leaf "draw.lisp" 'draw '(:x 800 :y 600)))
 
-(defun test ()
-    (make-tree (tree-serialize branch)))
+(defun query ()
+    (message-tree tree 'update))
+
+; i'm passing the data wrong somehow
+(defun add ()
+    (message-tree tree 'location 11 11))
 
 (defun reload ()
     (load "tree.lisp"))

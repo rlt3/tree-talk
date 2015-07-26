@@ -51,9 +51,18 @@
             (message-data self))))
 
 (defmethod message-send-to ((self message) recipient)
-    (message-set-recipient! self recipient)
+    ;(message-set-recipient! self recipient)
     (restart-case
-        (message-send self)
+        ;(message-send self)
+        
+        (apply 
+            #'funcall
+            (append
+                (list (message-type self)
+                      recipient
+                      self)
+                (message-data self)))
+
         (try-different-message (message-type)
             :interactive prompt-for-new-message
             (message-send-to
