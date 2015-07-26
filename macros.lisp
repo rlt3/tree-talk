@@ -37,7 +37,3 @@
         (mapcar
             (lambda (m) (append name m))
             method-list)))
-
-(defun private-property (object property-symbol)
-    "Clarity function for private property access in classes."
-    (slot-value object property-symbol))

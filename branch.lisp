@@ -29,11 +29,6 @@
         (slot-value self 'leaves)
         (append (branch-leaves self) (list leaf))))
 
-(defmethod branch-message ((self branch) (msg message))
-    "Message the leaves of this branch."
-    ;(message-set-sender! msg self)
-    (branch-each-leaf self (lambda (l) (leaf-message l msg))))
-
 (defmethod branch-load! ((self branch))
     "Load the leaves of an branch."
     (branch-each-leaf self #'leaf-load!))

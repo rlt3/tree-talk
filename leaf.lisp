@@ -1,5 +1,3 @@
-(load "message.lisp")
-
 (defclass leaf ()
    ((filename  :reader leaf-filename 
                :initform "default"
@@ -13,15 +11,8 @@
                :initform '() 
                :initarg :env-vars)
 
-    (object)))
-
-(defmethod leaf-message ((self leaf) (msg message))
-    "Message the leaf."
-    (message-send-to msg (private-property self 'object))
-    ;(handler-case
-    ;    (message-send-to msg (private-property self 'object))
-    ;    (condition (e) self))
-    self)
+    (   object :reader leaf-petal
+               :initform ())))
 
 (defmethod leaf-load! ((self leaf))
     "Load our script file if needed and then load the script with the 

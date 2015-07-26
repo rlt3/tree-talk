@@ -76,3 +76,29 @@
 (defmethod message-think ((self message) message-type &rest data)
     (let ((b (message-sender self)))
         (branch-message b (make-message b b message-type data))))
+
+(defmethod message-leaf ((self message) (leaf leaf))
+    "Message the leaf."
+    (message-send-to self (leaf-petal leaf))
+    ;(handler-case
+    ;     (message-send-to self (leaf-petal leaf))
+    ;    (condition (e) self))
+    self)
+
+(defmethod message-branch ((self message) (branch branch))
+    "Message the leaves of this branch."
+    ;(message-set-sender! msg self)
+    (branch-each-leaf branch 
+        (lambda (leaf) 
+            (message-leaf self leaf))))
+
+(defmethod message-tree ((self message) (branch branch))
+    "Send a message to the entire tree."
+    (message-branch self branch)
+    (branch-each-child branch 
+        (lambda (child) 
+            (message-tree self child))))
+
+(defun message-tree-s (tree message-type &rest data)
+    "Ease-of-use function that automatically makes a message object for us."
+    (message-tree (make-message tree tree message-type data) tree))

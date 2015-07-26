@@ -13,4 +13,4 @@
     (collision-check self))
 
 (defmethod update ((self collision) (msg message))
-  (format t "checking collision~%"))
+    (format t "checking collision~%"))
