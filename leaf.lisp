@@ -1,3 +1,9 @@
+;;; Leaves are what makes a branch be different from another branch.
+;;;
+;;; A leaf holds and iteracts with state that is kept hidden from all other
+;;; leaves. The only way for any leaf root to interact with another is to have
+;;; some external system act upon it.
+
 (defclass leaf ()
    ((filename  :reader leaf-filename 
                :initform "default"
@@ -11,7 +17,7 @@
                :initform '() 
                :initarg :env-vars)
 
-    (   object :reader leaf-petal
+    (   object :reader leaf-root
                :initform ())))
 
 (defmethod leaf-load! ((self leaf))

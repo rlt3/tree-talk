@@ -1,8 +1,6 @@
-(load "macros.lisp")
-(load "leaf.lisp")
 (load "branch.lisp")
-(load "parse.lisp")
-(load "message.lisp")
+
+;;; A tree is a collection of branches.
 
 (defmethod tree-load! ((self branch))
     "Load the entire tree's leaves."
@@ -21,18 +19,3 @@
         (parse-each-leaf serialized-tree (lambda (o) (apply #'make-leaf o)))
         (parse-each-child serialized-tree #'make-tree)))
 
-;   TODO:
-;       * Need to create our `talk' procedures, e.g. reply, command, think
-;       * We only want our tree to load every script file once even if it
-;       is used in many leaves. How do we accomplish this?
-
-(defvar tree (make-tree tree-structure))
-(defvar branch (car (branch-children tree)))
-(defvar leaf (car (branch-leaves branch)))
-
-(defvar start-msg (make-message branch branch 'start ()))
-
-(defun reload ()
-    (load "tree.lisp"))
-
-(tree-load! tree)

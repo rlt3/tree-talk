@@ -1,56 +1,53 @@
+;;; A message is simply a function call. A message, at the very end, is just
+;;; invoking a function passed to title and passing the data to it. 
+;;;
+;;; The novel idea is that these function calls aren't just glorified methods.
+;;; Any object, anywhere can listen for these messages and choose how to 
+;;; respond or whether to respond at all. 
+;;;
+;;; Then there are specific ways of sending a message, like to itself, it's
+;;; children, the children of its parent (excluding itself), etc. 
+;;;
+;;; The messages are asynchronous and a message doesn't require a response. Any
+;;; response given would simply be a new message sent.
+
 (defclass message ()
-  ((   sender :reader message-sender
-              :initform ()
-              :initarg :sender)
-   (   author :reader message-author
-              :initform ()
-              :initarg :author)
-   (     kind :reader message-type
-              :initform 'default
-              :initarg :kind)
-   (     data :reader message-data
-              :initform ()
-              :initarg :data)
-   (recipient :accessor message-recipient
-              :initform ())))
+  ((    to :reader message-to
+           :initform ()
+           :initarg :to)
+   (  from :reader message-from
+           :initform ()
+           :initarg :from)
+   ( title :reader message-type
+           :initform 'default
+           :initarg :title)
+   (  body :reader message-body
+           :initform ()
+           :initarg :body)))
 
-(defun make-message (sender author kind data)
-    (make-instance 'message 
-            ;:sender sender 
-            :author author 
-            :kind kind 
-            :data data))
+(defmethod message-set-to! ((self message) to)
+    (setf (slot-value self 'to) to))
 
-(defmethod message-set-recipient! ((self message) recipient)
-    (setf (message-recipient self) recipient))
-
-(defmethod message-set-sender! ((self message) sender)
-    (setf (slot-value self 'sender) sender))
-
-(defmethod message-send ((self message))
+(defmethod message-send ((self message) object)
     "Send the message."
-    (apply 
-        #'funcall
-        (append
-            (list (message-type self)
-                  (message-recipient self)
-                  self)
-            (message-data self))))
-
-(defmethod message-send-to ((self message) recipient)
-    (message-set-recipient! self recipient)
     (handler-case
-        (message-send self)
+        (apply 
+            #'funcall
+            (append
+                (list (message-type self)
+                      object
+                      self)
+            (message-body self)))
         (condition (e) self))
     self)
 
 (defmethod message-leaf ((self message) (leaf leaf))
     "Message the leaf."
-    (message-send-to self (leaf-petal leaf)))
+    (message-send self (leaf-root leaf)))
 
 (defmethod message-branch ((self message) (branch branch))
     "Message the leaves of this branch."
-    (message-set-sender! self branch)
+    (message-set-to! self branch)
     (branch-each-leaf branch 
         (lambda (leaf) 
             (message-leaf self leaf))))
@@ -62,11 +59,24 @@
         (lambda (child) 
             (message-tree self child))))
 
-(defun m (tree message-type &rest data)
-    "Ease-of-use function that automatically makes a message object for us."
-    (message-tree (make-message tree tree message-type data) tree))
-
-(defmethod message-think ((self message) message-type &rest data)
+(defmethod message-think ((self message) message-type &rest body)
     "Have a leaf of a branch message the other leaves on the branch."
-    (let ((b (message-sender self)))
-        (message-branch (make-message b b message-type data) b)))
+    (let ((branch (message-to self)))
+        (message-branch (make-message branch message-type body) branch)))
+
+;(defmethod message-think ((self message))
+;    "A leaf messages the other leaves on its branch."
+;    (message-branch self (message-to self)))
+;
+;(defmethod message-reply ((self message))
+;    "A branch replies directly to another branch."
+;    (message-branch self (message-from self)))
+;
+;(defmethod message-command ((self message))
+;    "A branch messages its children."
+;    (branch-each-child (message-from self)
+;        (lambda (child) (message-branch self child)))
+
+
+(defun make-message (from title body)
+    (make-instance 'message :from from :title title :body body))

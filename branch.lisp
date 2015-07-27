@@ -1,3 +1,11 @@
+(load "leaf.lisp")
+
+;;; A branch is a collection of leaves.
+;;;
+;;; Branches are a traditional `node' of a tree. Branches have children, but
+;;; it is the leaves that define them. Thinking of a branch as an object, the
+;;; leaves are their properties.
+
 (defclass branch ()
     ((  leaves :reader branch-leaves
                :initform ()
@@ -5,9 +13,6 @@
      (children :reader branch-children
                :initform ()
                :initarg :children)))
-
-(defun make-branch (leaves children)
-  (make-instance 'branch :leaves leaves :children children))
 
 (defmethod branch-each-side ((self branch) side procedure)
     "Do the procedure for a deviant of the branch."
@@ -32,3 +37,6 @@
 (defmethod branch-load! ((self branch))
     "Load the leaves of an branch."
     (branch-each-leaf self #'leaf-load!))
+
+(defun make-branch (leaves children)
+  (make-instance 'branch :leaves leaves :children children))
