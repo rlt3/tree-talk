@@ -3,6 +3,7 @@
 (load "parse.lisp")
 (load "tree.lisp")
 (load "message.lisp")
+(load "post.lisp")
 
 ;   TODO:
 ;       * Need to create our `talk' procedures, e.g. reply, command, think
