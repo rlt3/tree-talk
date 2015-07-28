@@ -3,4 +3,4 @@
 (defmethod update ((self deboog) (self message)))
 
 (defmethod start ((self deboog) (msg message))
-    (message-think msg 'location 11 12))
+    (response-think msg 'location 11 12))

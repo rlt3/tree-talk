@@ -29,7 +29,8 @@
            :initarg :body)))
 
 (defmethod message-set-to! ((self message) to)
-    (setf (slot-value self 'to) to))
+    (setf (slot-value self 'to) to)
+    self)
 
 (defmethod message-send ((self message) object)
     "Send the message."
@@ -76,24 +77,26 @@
             (message-method self)
             self)))
 
-(defmethod post-broadcast ((self message))
+(defmethod post-broadcast ((msg message))
     "Send a message to the entire tree."
-    (message-tree self (message-author self)))
+    (message-tree msg (message-author msg)))
 
-(defmethod post-think ((self message))
+(defmethod post-think ((response message))
     "A leaf messages the other leaves on its branch."
-    (message-branch self (message-author self)))
+    (message-branch msg (message-author msg)))
 
-(defmethod post-reply ((self message))
+(defmethod post-reply ((msg message))
     "A branch replies directly to another branch."
-    (message-branch self (message-author self)))
+    (message-branch msg (message-to msg)))
 
-(defmethod post-command ((self message))
+(defmethod post-command ((msg message))
     "A branch messages its children."
-    (branch-each-child (message-author self)
+    (branch-each-child (message-author msg)
         (lambda (child) 
-          (message-branch self child))))
+          (message-branch msg child))))
 
-(defmethod message-think ((self message) title &rest body)
+(defmethod response-think ((old message) title &rest body)
     "Assemble the message for post-think."
-    (make-message (message-to self) title body #'post-think))
+    (message-set-to! 
+        (make-message (message-to old) title body #'post-think)
+        (message-author old)))
