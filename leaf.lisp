@@ -29,8 +29,7 @@
         (slot-value self 'object) 
         (apply #'make-instance 
             (leaf-class-sym self)
-            (leaf-env-vars self)))
-    self)
+            (leaf-env-vars self))))
 
 (defmethod leaf-serialize ((self leaf))
     "Export lists and reload by applying those lists to make-leaf."

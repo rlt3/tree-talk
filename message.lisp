@@ -18,6 +18,9 @@
    (  from :reader message-from
            :initform ()
            :initarg :from)
+   (method :reader message-method
+           :initform ()
+           :initarg :method)
    ( title :reader message-type
            :initform 'default
            :initarg :title)
@@ -37,9 +40,8 @@
                 (list (message-type self)
                       object
                       self)
-            (message-body self)))
-        (condition (e) self))
-    self)
+                (message-body self)))
+        (condition (e) ())))
 
 (defmethod message-leaf ((self message) (leaf leaf))
     "Message the leaf."
@@ -53,30 +55,43 @@
             (message-leaf self leaf))))
 
 (defmethod message-tree ((self message) (branch branch))
-    "Send a message to the entire tree."
+    "Send a message to the tree from a branch recursively."
     (message-branch self branch)
-    (branch-each-child branch 
+    (branch-each-child branch
         (lambda (child) 
             (message-tree self child))))
 
-(defmethod message-think ((self message) message-type &rest body)
+(defmethod message-method-broadcast ((self message))
+    "Send a message to the entire tree."
+    (message-tree self (message-from self)))
+
+(defmethod message-method-think ((self message))
+    "A leaf messages the other leaves on its branch."
+    (message-branch self (message-to self)))
+
+(defmethod message-method-reply ((self message))
+    "A branch replies directly to another branch."
+    (message-branch self (message-from self)))
+
+(defmethod message-method-command ((self message))
+    "A branch messages its children."
+    (branch-each-child (message-from self)
+        (lambda (child) 
+          (message-branch self child))))
+
+(defun make-message (from title body method)
+    (make-instance 'message 
+        :from from 
+        :title title 
+        :body body 
+        :method method))
+
+(defmethod message-post ((self message))
+    "The message dispatch procedure."
+    (funcall
+        (message-method self)
+        self))
+
+(defmethod message-think ((self message) title &rest body)
     "Have a leaf of a branch message the other leaves on the branch."
-    (let ((branch (message-to self)))
-        (message-branch (make-message branch message-type body) branch)))
-
-;(defmethod message-think ((self message))
-;    "A leaf messages the other leaves on its branch."
-;    (message-branch self (message-to self)))
-;
-;(defmethod message-reply ((self message))
-;    "A branch replies directly to another branch."
-;    (message-branch self (message-from self)))
-;
-;(defmethod message-command ((self message))
-;    "A branch messages its children."
-;    (branch-each-child (message-from self)
-;        (lambda (child) (message-branch self child)))
-
-
-(defun make-message (from title body)
-    (make-instance 'message :from from :title title :body body))
+    (make-message (message-to self) title body #'message-method-think))

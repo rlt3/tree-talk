@@ -17,6 +17,9 @@
 
 (tree-load! tree)
 
-(defun post (tree title &rest body)
+(defvar start (make-message branch 'start () #'message-method-broadcast))
+
+(defun treepost (tree title &rest body)
     "The entry point to message a tree."
-    (message-tree (make-message tree title body) tree))
+    (message-post 
+        (make-message tree title body #'message-method-broadcast)))
