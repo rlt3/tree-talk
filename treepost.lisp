@@ -1,7 +1,8 @@
+(load "utilities.lisp")
+(load "macros.lisp")
 (load "parse.lisp")
 (load "tree.lisp")
 (load "message.lisp")
-(load "macros.lisp")
 
 ;   TODO:
 ;       * Need to create our `talk' procedures, e.g. reply, command, think
@@ -17,9 +18,9 @@
 
 (tree-load! tree)
 
-(defvar start (make-message branch 'start () #'message-method-broadcast))
+(defvar start (make-message branch 'start () #'post-broadcast))
 
 (defun treepost (tree title &rest body)
     "The entry point to message a tree."
     (message-post 
-        (make-message tree title body #'message-method-broadcast)))
+        (make-message tree title body #'post-broadcast)))
