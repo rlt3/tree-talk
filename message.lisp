@@ -1,35 +1,21 @@
-;;; A message is simply a function call. A message, at the very end, is just
-;;; invoking a function passed to title and passing the data to it. 
+;;; A message is sent to a method, not a node or set of nodes. This means that
+;;; the author of the message doesn't know the recipients.
 ;;;
-;;; The novel idea is that these function calls aren't just glorified methods.
-;;; Any object, anywhere can listen for these messages and choose how to 
-;;; respond or whether to respond at all. 
-;;;
-;;; Then there are specific ways of sending a message, like to itself, it's
-;;; children, the children of its parent (excluding itself), etc. 
-;;;
-;;; The messages are asynchronous and a message doesn't require a response. Any
-;;; response given would simply be a new message sent.
+;;; Messages are sent to different `post offices'. Each post office sends the
+;;; message in a different way. 
 
 (defclass message ()
-  ((    to :reader message-to
-           :initform ()
-           :initarg :to)
-   (  from :reader message-author
-           :initform ()
-           :initarg :from)
-   (method :reader message-method
-           :initform ()
-           :initarg :method)
-   ( title :reader message-title
-           :initform 'default
-           :initarg :title)
-   (  body :reader message-body
-           :initform ()
-           :initarg :body)))
+  ((  from :reader message-author :initform ()       :initarg :from)
+   (method :reader message-method :initform ()       :initarg :method)
+   ( title :reader message-title  :initform 'default :initarg :title)
+   (  body :reader message-body   :initform ()       :initarg :body)
 
-(defmethod message-set-recipient! ((self message) to)
-    (setf (slot-value self 'to) to)
+   ; stamps
+   (recipient :accessor message-recipient :initarg :recipient)))
+
+(defmethod message-stamp! (property-sym (self message) value)
+    "Single entry for changing our message object."
+    (setf (slot-value self property-sym) value)
     self)
 
 (defmethod message-send ((self message) object)
@@ -51,9 +37,15 @@
             (message-method self)
             self)))
 
-(defun make-message (from title body method)
-    (make-instance 'message 
-        :from from 
-        :title title 
-        :body body 
-        :method method))
+(defun make-message (from title body method &rest stamps)
+    "Make message with standard options and optionally add stamps which has to
+    come in the form ':stamp-name stamp-value'"
+    (apply
+        #'make-instance
+        (append
+            (list 'message
+                  :from from 
+                  :title title 
+                  :body body 
+                  :method method)
+            stamps)))

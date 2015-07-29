@@ -10,18 +10,18 @@
 ;       * We only want our tree to load every script file once even if it
 ;       is used in many leaves. How do we accomplish this?
 
-(defvar tree (make-tree tree-structure))
-(defvar branch (car (branch-children tree)))
-(defvar leaf (car (branch-leaves branch)))
+(defvar *tree* (make-tree tree-structure))
+(defvar *branch* (car (branch-children *tree*)))
+(defvar *leaf* (car (branch-leaves *branch*)))
 
 (defun reload ()
     (load "treepost.lisp"))
 
-(tree-load! tree)
+(tree-load! *tree*)
 
-(defvar start (make-message branch 'start () #'post-broadcast))
+(defvar start (make-message *branch* 'start () #'post-broadcast))
 
-(defun treepost (tree title &rest body)
+(defun treepost (title &rest body)
     "The entry point to message a tree."
     (message-post 
-        (make-message tree title body #'post-broadcast)))
+        (make-message *tree* title body #'post-broadcast)))
