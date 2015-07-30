@@ -4,4 +4,5 @@
 
 (defmethod start ((self deboog) (msg message))
     "When we receive the start message, update this object's location."
-    (response-think msg 'location 11 12))
+    (flet ((think (title &rest data) (response-think msg title data)))
+        (think 'location 11 12)))

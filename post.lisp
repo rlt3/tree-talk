@@ -55,3 +55,9 @@
 (defun response-command (old-message title &rest body)
     "Assemble the message for post-command."
     (make-message (message-recipient old-message) title body #'post-command))
+
+(defun response-curry (procedure message)
+    "Currying procedure for responses for our macros."
+    (lambda (title body)
+        (apply procedure
+            (append (list message title) body))))
