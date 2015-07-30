@@ -6,9 +6,10 @@
 (load "post.lisp")
 
 ;   TODO:
-;       * Need to create our `talk' procedures, e.g. reply, command, think
 ;       * We only want our tree to load every script file once even if it
 ;       is used in many leaves. How do we accomplish this?
+;       * How do we handle threading? Per message or per message list? Is our
+;       data structure thread-safe?
 
 (defvar *tree* (make-tree tree-structure))
 (defvar *branch* (car (branch-children *tree*)))
@@ -18,8 +19,6 @@
     (load "treepost.lisp"))
 
 (tree-load! *tree*)
-
-(defvar start (make-message *branch* 'start () #'post-broadcast))
 
 (defun treepost (title &rest body)
     "The entry point to message a tree."

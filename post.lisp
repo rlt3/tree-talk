@@ -1,61 +1,57 @@
-(defmethod post-to-leaf ((self message) (leaf leaf))
+(defun post-to-leaf (message leaf)
     "Message the leaf."
-    (message-send self (leaf-root leaf)))
+    (message-send message (leaf-root leaf)))
 
-(defmethod post-to-branch ((self message) (branch branch))
+(defun post-to-branch (message branch)
     "Message the leaves of this branch."
-    (message-stamp! 'recipient self branch)
+    (message-stamp! 'recipient message branch)
     (branch-each-leaf branch 
         (lambda (leaf) 
-            (post-to-leaf self leaf))))
+            (post-to-leaf message leaf))))
 
-(defmethod post-to-branch-recursive ((self message) (branch branch))
+(defun post-to-branch-recursive (message branch)
     "Send a message to a tree from a branch recursively."
     (append 
-        (post-to-branch self branch)
+        (post-to-branch message branch)
         (branch-each-child branch
             (lambda (child) 
-                (post-to-branch-recursive self child)))))
+                (post-to-branch-recursive message child)))))
 
-(defmethod post-broadcast ((msg message))
+;; Methods in which we send our messages.
+
+(defun post-broadcast (message)
     "Send a message to the entire tree."
-    (post-to-branch-recursive msg *tree*))
+    (post-to-branch-recursive message *tree*))
 
-(defmethod post-think ((msg message))
+(defun post-think (message)
     "A leaf messages the other leaves on its branch."
-    (post-to-branch msg (message-author msg)))
+    (post-to-branch message (message-author message)))
 
-(defmethod post-reply ((msg message))
+(defun post-reply (message)
     "A branch replies directly to another branch."
-    (post-to-branch msg (message-recipient msg)))
+    (post-to-branch message (message-recipient message)))
 
-(defmethod post-command ((msg message))
+(defun post-command (message)
     "A branch messages its children."
-    (branch-each-child (message-author msg)
+    (branch-each-child (message-author message)
         (lambda (child) 
-          (post-to-branch msg child))))
+            (post-to-branch message child))))
 
-;(defmethod message-response ((old message) title &rest body &optional)
-;(defmethod message-response ((old message) method title &rest body)
-;    (apply
-;        #'make-message
-;        (append
-;            (list (old-recipient old) title body method)
-;    (make-message (old-recipient old) title body method)
+;; Procedures which compose the responses as messages using the methods above.
 
-(defmethod response-broadcast ((old message) title &rest body)
+(defun response-broadcast (old-message title &rest body)
     "Assemble the message for post-broadcast."
-    (make-message (message-recipient old) title body #'post-broadcast))
+    (make-message (message-recipient old-message) title body #'post-broadcast))
 
-(defmethod response-reply ((old message) title &rest body)
+(defun response-reply (old-message title &rest body)
     "Assemble the message for post-reply."
-    (make-message (message-recipient old) title body #'post-reply
-        :recipient (message-author old)))
+    (make-message (message-recipient old-message) title body #'post-reply
+        :recipient (message-author old-message)))
 
-(defmethod response-think ((old message) title &rest body)
+(defun response-think (old-message title &rest body)
     "Assemble the message for post-think."
-    (make-message (message-recipient old) title body #'post-think))
+    (make-message (message-recipient old-message) title body #'post-think))
 
-(defmethod response-command ((old message) title &rest body)
+(defun response-command (old-message title &rest body)
     "Assemble the message for post-command."
-    (make-message (message-recipient old) title body #'post-command))
+    (make-message (message-recipient old-message) title body #'post-command))
