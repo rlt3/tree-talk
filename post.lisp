@@ -39,25 +39,19 @@
 
 ;; Procedures which compose the responses as messages using the methods above.
 
-(defun response-broadcast (old-message title &rest body)
+(defun response-broadcast (old-message title body)
     "Assemble the message for post-broadcast."
     (make-message (message-recipient old-message) title body #'post-broadcast))
 
-(defun response-reply (old-message title &rest body)
+(defun response-reply (old-message title body)
     "Assemble the message for post-reply."
     (make-message (message-recipient old-message) title body #'post-reply
         :recipient (message-author old-message)))
 
-(defun response-think (old-message title &rest body)
+(defun response-think (old-message title body)
     "Assemble the message for post-think."
     (make-message (message-recipient old-message) title body #'post-think))
 
-(defun response-command (old-message title &rest body)
+(defun response-command (old-message title body)
     "Assemble the message for post-command."
     (make-message (message-recipient old-message) title body #'post-command))
-
-(defun response-curry (procedure message)
-    "Currying procedure for responses for our macros."
-    (lambda (title body)
-        (apply procedure
-            (append (list message title) body))))

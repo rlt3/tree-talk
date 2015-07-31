@@ -15,8 +15,17 @@
 (defvar *branch* (car (branch-children *tree*)))
 (defvar *leaf* (car (branch-leaves *branch*)))
 
+(defvar *update* (make-message *branch* 'update () #'post-think))
+(defvar *location* (make-message *branch* 'location '(22 -400) #'post-think))
+
+(defun me (macro)
+    (macroexpand-1 macro))
+
 (defun reload ()
     (load "treepost.lisp"))
+
+; can set to message-send-debug for debugging purposes
+(setf (symbol-function 'message-send) #'message-send-to)
 
 (tree-load! *tree*)
 

@@ -3,9 +3,10 @@
         (list ())
         (list
             (list
-                (list '("debug.lisp" deboog ())
-                      '("collision.lisp" collision ())
-                      '("draw.lisp" draw (:x 10 :y 15)))
+                (list 
+                      '("debug.lisp" deboog ())
+                      '("draw.lisp" draw (:x 10 :y 15))
+                      '("collision.lisp" collision ()))
                 (list 
                     (list 
                         (list '("collision.lisp" collision ())

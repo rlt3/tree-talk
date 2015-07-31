@@ -18,8 +18,18 @@
     (setf (slot-value self property-sym) value)
     self)
 
-(defmethod message-send ((self message) object)
-    "Send the message."
+(defmethod message-send-debug ((self message) object)
+    "Send the message to an object."
+    (apply 
+        #'funcall
+        (append
+            (list (message-title self)
+                  object
+                  self)
+            (message-body self))))
+
+(defmethod message-send-to ((self message) object)
+    "Send the message to an object."
     (handler-case
         (apply 
             #'funcall
@@ -31,7 +41,7 @@
         (condition (e) ())))
 
 (defmethod message-post ((self message))
-    "The message dispatch procedure."
+    "Dispatch the message via its method."
     (flatten
         (funcall
             (message-method self)
