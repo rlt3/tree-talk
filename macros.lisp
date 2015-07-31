@@ -1,35 +1,3 @@
-;   What if we made a macro that made this code:
-;(script-class name (inherit-a b)
-;    ((public 'foo)
-;     (private 'bar)
-;     (protected 'baz))
-;    (method-name (arg-a b c) 
-;        (check-stuff arg-a b c)
-;        (think 'make-sound 'laugh)))
-;
-;
-;   into this:
-;(defclass name (inherit-a b)
-;    ((foo :accessor name-foo :initarg :foo)
-;     (bar :initarg :bar)
-;     (baz :reader name-baz :initarg :baz)))
-;
-;(defmethod method-name ((self name msg message) arg-a b c)
-;    (let 
-;        ((think (lambda (m-type &rest data)
-;                    (message-think msg m-type data))))
-;        (check-stuff arg-a b c)
-;        (think 'make-sound 'laugh)))
-
-(defmacro create-method (classname &rest definition)
-    "Create a class method without having to declare self and other misc
-    procedures so that the scripter can focus just on scripting."
-        (let ((name (car definition))
-          (args (append (list (list 'self classname)) (cadr definition)))
-          (body (caddr definition)))
-          `(defmethod ,name ,args
-             ,body)))
-
 (defmacro create-class (name super-list property-list method-list)
     `(defclass ,name () ())
     (mapcar
@@ -37,3 +5,21 @@
         (mapcar
             (lambda (m) (append name m))
             method-list)))
+
+(defmacro handle-message (name class args &optional doc-string &rest body)
+    `(defmethod ,name ((self ,class) (msg message) ,@args)
+        ,doc-string
+        (flet ((property (sym)
+                    (slot-value self sym))
+               (think (title &rest data) 
+                    (response-think msg title data))
+               (reply (title &rest data) 
+                    (response-reply msg title data))
+               (broadcast (title &rest data) 
+                    (response-broadcast msg title data))
+               (command (title &rest data) 
+                    (response-command msg title data)))
+        ,@body)))
+
+(defun me (macro)
+    (macroexpand-1 macro))
