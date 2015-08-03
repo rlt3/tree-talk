@@ -75,7 +75,7 @@ Right now there are just four ways:
 
 ## How do I use this?
 
-Just clone the repo and pop "treepost.lisp" into your interpreter. If you want
+Just clone the repo and pop "tree-talk.lisp" into your interpreter. If you want
 to play around `treepost` is the procedure you're looking for. `(treepost 
 'update)` will spit out some information.
 

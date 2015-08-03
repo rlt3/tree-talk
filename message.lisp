@@ -40,13 +40,6 @@
                 (message-body self)))
         (condition (e) ())))
 
-(defmethod message-post ((self message))
-    "Dispatch the message via its method."
-    (flatten
-        (funcall
-            (message-method self)
-            self)))
-
 (defun make-message (from title body method &rest stamps)
     "Make message with standard options and optionally add stamps which has to
     come in the form ':stamp-name stamp-value'"

@@ -1,35 +1,66 @@
-(load "utilities.lisp")
-(load "macros.lisp")
-(load "parse.lisp")
-(load "tree.lisp")
-(load "message.lisp")
-(load "post.lisp")
+;;; The `post office' of the tree -- treepost.
 
-;   TODO:
-;       * We only want our tree to load every script file once even if it
-;       is used in many leaves. How do we accomplish this?
-;       * How do we handle threading? Per message or per message list? Is our
-;       data structure thread-safe?
+(defmethod treepost ((self message))
+    "Dispatch the message via its method."
+    (flatten
+        (funcall
+            (message-method self)
+            self)))
 
-(defvar *tree* (make-tree tree-structure))
-(defvar *branch* (car (branch-children *tree*)))
-(defvar *leaf* (car (branch-leaves *branch*)))
+(defun post-to-leaf (message leaf)
+    "Message the leaf."
+    (message-send message (leaf-root leaf)))
 
-(defvar *update* (make-message *branch* 'update () #'post-think))
-(defvar *location* (make-message *branch* 'location '(22 -400) #'post-think))
+(defun post-to-branch (message branch)
+    "Message the leaves of this branch."
+    (message-stamp! 'recipient message branch)
+    (branch-each-leaf branch 
+        (lambda (leaf) 
+            (post-to-leaf message leaf))))
 
-(defun me (macro)
-    (macroexpand-1 macro))
+(defun post-to-branch-recursive (message branch)
+    "Send a message to a tree from a branch recursively."
+    (append 
+        (post-to-branch message branch)
+        (branch-each-child branch
+            (lambda (child) 
+                (post-to-branch-recursive message child)))))
 
-(defun reload ()
-    (load "treepost.lisp"))
+;; Methods in which we send our messages.
 
-; can set to message-send-debug for debugging purposes
-(setf (symbol-function 'message-send) #'message-send-to)
+(defun post-broadcast (message)
+    "Send a message to the entire tree."
+    (post-to-branch-recursive message *tree*))
 
-(tree-load! *tree*)
+(defun post-think (message)
+    "A leaf messages the other leaves on its branch."
+    (post-to-branch message (message-author message)))
 
-(defun treepost (title &rest body)
-    "The entry point to message a tree."
-    (message-post 
-        (make-message *tree* title body #'post-broadcast)))
+(defun post-reply (message)
+    "A branch replies directly to another branch."
+    (post-to-branch message (message-recipient message)))
+
+(defun post-command (message)
+    "A branch messages its children."
+    (branch-each-child (message-author message)
+        (lambda (child) 
+            (post-to-branch message child))))
+
+;; Procedures which compose the responses as messages using the methods above.
+
+(defun response-broadcast (old-message title body)
+    "Assemble the message for post-broadcast."
+    (make-message (message-recipient old-message) title body #'post-broadcast))
+
+(defun response-reply (old-message title body)
+    "Assemble the message for post-reply."
+    (make-message (message-recipient old-message) title body #'post-reply
+        :recipient (message-author old-message)))
+
+(defun response-think (old-message title body)
+    "Assemble the message for post-think."
+    (make-message (message-recipient old-message) title body #'post-think))
+
+(defun response-command (old-message title body)
+    "Assemble the message for post-command."
+    (make-message (message-recipient old-message) title body #'post-command))
