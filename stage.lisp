@@ -1,6 +1,25 @@
 (load "tree-talk.lisp")
 
-(defvar tree-structure
+(defun me (macro)
+    (macroexpand-1 macro))
+
+(defun reload ()
+    (load "stage.lisp"))
+
+(in-package :tree-talk)
+
+(defmethod message-send ((self message) object)
+    "Debug overwrite method for our `message-send' procedure."
+        (funcall (message-title self) object self))
+    ;(apply 
+    ;    #'funcall
+    ;    (append
+    ;        (list (message-title self)
+    ;              object
+    ;              self)
+    ;        (message-body self))))
+
+(defvar *tree-structure*
     (list
         (list ())
         (list
@@ -19,28 +38,13 @@
                       '("draw.lisp" draw (:x 40 :y 80)))
                 (list ())))))
 
+(defvar *tree* (make-tree *tree-structure*))
 
-(defvar *tree* (make-tree tree-structure))
-(defvar *branch* (car (branch-children *tree*)))
-(defvar *leaf* (car (branch-leaves *branch*)))
+(export '*tree* :tree-talk)
 
-(defvar *update* (make-message *branch* 'update () #'post-think))
-(defvar *location* (make-message *branch* 'location '(22 -400) #'post-think))
+;(defvar *branch* (car (branch-children *tree*)))
+;(defvar *leaf* (car (branch-leaves *branch*)))
+;
+;(defvar *update* (make-message *branch* 'update () #'post-think))
+;(defvar *location* (make-message *branch* 'location '(22 -400) #'post-think))
 
-(defun me (macro)
-    (macroexpand-1 macro))
-
-(defun reload ()
-    (load "scratch.lisp"))
-
-(defmethod message-send-debug ((self message) object)
-    "Debug overwrite method for our `message-send' procedure."
-    (apply 
-        #'funcall
-        (append
-            (list (message-title self)
-                  object
-                  self)
-            (message-body self))))
-
-(tree-load! *tree*)

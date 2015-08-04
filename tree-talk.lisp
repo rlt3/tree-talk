@@ -1,3 +1,15 @@
+(defpackage :tree-talk
+            (:use :common-lisp)
+            (:export :handler
+                     :handle-message
+                     :helper
+                     :make-tree
+                     :tree-load!
+                     :message-tree
+                     :message-tree-list))
+
+(in-package :tree-talk)
+
 (load "utilities.lisp")
 (load "macros.lisp")
 (load "parse.lisp")

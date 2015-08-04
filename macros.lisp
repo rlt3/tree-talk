@@ -1,6 +1,10 @@
+(defmacro our-package ()
+    `(in-package :cl-user)
+    `(use-package :tree-talk))
+
 (defmacro handler (name super-list property-list)
     "A wrapper for classes so we can know the class name."
-    (setq *handler-class* name)
+    (our-package)
     `(defclass ,name ,super-list
         ,property-list))
 
