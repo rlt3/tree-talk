@@ -1,5 +1,3 @@
-(load "branch.lisp")
-
 ;;; A tree is a collection of branches.
 
 (defmethod tree-load! ((self branch))

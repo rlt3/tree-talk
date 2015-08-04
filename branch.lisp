@@ -1,5 +1,3 @@
-(load "leaf.lisp")
-
 ;;; A branch is a collection of leaves.
 ;;;
 ;;; Branches are a traditional `node' of a tree. Branches have children, but

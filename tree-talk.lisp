@@ -1,13 +1,8 @@
-(defpackage :tree-talk
-    (:use :common-lisp)
-    (:export :message-tree
-             :message-tree-list))
-
-(in-package :tree-talk)
-
 (load "utilities.lisp")
 (load "macros.lisp")
 (load "parse.lisp")
+(load "leaf.lisp")
+(load "branch.lisp")
 (load "tree.lisp")
 (load "message.lisp")
 (load "treepost.lisp")
@@ -29,10 +24,10 @@
     (macroexpand-1 macro))
 
 (defun reload ()
-    (load "treepost.lisp"))
+    (load "tree-talk.lisp"))
 
 ; can set to message-send-debug for debugging purposes
-(setf (symbol-function 'message-send) #'message-send-debug)
+(setf (symbol-function 'message-send) #'message-send-to)
 
 (tree-load! *tree*)
 
