@@ -1,11 +1,12 @@
 ;;; The `post office' of the tree -- treepost.
 
-(defmethod treepost ((self message))
+(defun treepost (tree msg)
     "Dispatch the message via its method."
     (flatten
         (funcall
-            (message-method self)
-            self)))
+            (message-method msg)
+            tree
+            msg)))
 
 (defun post-to-leaf (message leaf)
     "Message the leaf."
@@ -28,19 +29,19 @@
 
 ;; Methods in which we send our messages.
 
-(defun post-broadcast (message)
+(defun post-broadcast (tree message)
     "Send a message to the entire tree."
-    (post-to-branch-recursive message *tree*))
+    (post-to-branch-recursive message tree))
 
-(defun post-think (message)
+(defun post-think (tree message)
     "A leaf messages the other leaves on its branch."
     (post-to-branch message (message-author message)))
 
-(defun post-reply (message)
+(defun post-reply (tree message)
     "A branch replies directly to another branch."
     (post-to-branch message (message-recipient message)))
 
-(defun post-command (message)
+(defun post-command (tree message)
     "A branch messages its children."
     (branch-each-child (message-author message)
         (lambda (child) 

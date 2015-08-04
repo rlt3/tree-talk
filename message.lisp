@@ -18,17 +18,7 @@
     (setf (slot-value self property-sym) value)
     self)
 
-(defmethod message-send-debug ((self message) object)
-    "Send the message to an object."
-    (apply 
-        #'funcall
-        (append
-            (list (message-title self)
-                  object
-                  self)
-            (message-body self))))
-
-(defmethod message-send-to ((self message) object)
+(defmethod message-send ((self message) object)
     "Send the message to an object."
     (handler-case
         (apply 

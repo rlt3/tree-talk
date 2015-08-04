@@ -1,29 +1,6 @@
-(defvar tree-structure
-    (list
-        (list ())
-        (list
-            (list
-                (list 
-                      '("debug.lisp" deboog ())
-                      '("draw.lisp" draw (:x 10 :y 15))
-                      '("collision.lisp" collision ()))
-                (list 
-                    (list 
-                        (list '("collision.lisp" collision ())
-                              '("draw.lisp" draw (:x 800 :y 600)))
-                        (list ()))))
-            (list
-                (list '("collision.lisp" collision ())
-                      '("draw.lisp" draw (:x 40 :y 80)))
-                (list ())))))
-
-#||
- 
-  The form of our data structure is ( () () ). So, it is a list that has two
-lists inside. Knowing this, we can define how to get to each `side' and use
-those definitions to define their meaning.
-
-||#
+;;; The form of our data structure is ( () () ). So, it is a list that has
+;;; two lists inside. Knowing this, we can define how to get to each `side'
+;;; and use those definitions to define their meaning.
 
 (defun parse-left (form)
     (car form))
