@@ -1,3 +1,5 @@
+(in-package :tree-talk)
+
 (handler draw ()
     ((x :initform 0 :initarg :x)
      (y :initform 0 :initarg :y)))

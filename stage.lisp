@@ -6,19 +6,8 @@
 (defun reload ()
     (load "stage.lisp"))
 
+; setup our tree-structure and tree inside the tree-talk package
 (in-package :tree-talk)
-
-(defmethod message-send ((self message) object)
-    "Debug overwrite method for our `message-send' procedure."
-        (funcall (message-title self) object self))
-    ;(apply 
-    ;    #'funcall
-    ;    (append
-    ;        (list (message-title self)
-    ;              object
-    ;              self)
-    ;        (message-body self))))
-
 (defvar *tree-structure*
     (list
         (list ())
@@ -38,13 +27,11 @@
                       '("draw.lisp" draw (:x 40 :y 80)))
                 (list ())))))
 
+; and then export it so we can use it
 (defvar *tree* (make-tree *tree-structure*))
-
 (export '*tree* :tree-talk)
 
-;(defvar *branch* (car (branch-children *tree*)))
-;(defvar *leaf* (car (branch-leaves *branch*)))
-;
-;(defvar *update* (make-message *branch* 'update () #'post-think))
-;(defvar *location* (make-message *branch* 'location '(22 -400) #'post-think))
-
+; and then setup userland with our loaded tree
+(in-package :cl-user)
+(use-package :tree-talk)
+(tree-load! *tree*)

@@ -1,3 +1,5 @@
+(in-package :tree-talk)
+
 (handler deboog () ())
 
 (handle-message start () deboog

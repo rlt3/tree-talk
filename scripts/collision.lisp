@@ -1,3 +1,5 @@
+(in-package :tree-talk)
+
 (defclass collision ()
    ((x :accessor collision-x
        :initform 0
