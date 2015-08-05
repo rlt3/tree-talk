@@ -1,5 +1,3 @@
-(in-package :tree-talk)
-
 (defclass collision ()
    ((x :accessor collision-x
        :initform 0
@@ -8,5 +6,5 @@
        :initform 0
        :initarg :y)))
 
-(defmethod update ((self collision) (msg message))
+(handle-message update () collision
     (format t "checking collision~%"))

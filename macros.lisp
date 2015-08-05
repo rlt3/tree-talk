@@ -5,12 +5,14 @@
 
 (defmacro handle-message (name args handler &optional doc-string &rest body)
     "Creates a message-handler as a method for the handler's class."
-    `(defmethod ,name ((self ,handler) (msg message) ,@args)
+    `(defmethod ,name ((self ,handler) (msg tree-talk::message) ,@args)
         ,doc-string
         (flet ((property (sym)
                     (slot-value self sym))
                (property-set! (sym value)
                     (setf (slot-value self sym) value))
+               (help (procedure &rest data)
+                    (apply #'funcall (append (procedure self) data)))
                (think (title &rest data) 
                     (response-think msg title data))
                (reply (title &rest data) 

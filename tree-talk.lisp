@@ -1,8 +1,15 @@
 (defpackage :tree-talk
             (:use :common-lisp)
-            (:export :handler
+            (:export :self
+                     :handler
                      :handle-message
                      :helper
+                     :property
+                     :property-set!
+                     :think
+                     :reply
+                     :broadcast
+                     :command
                      :make-tree
                      :tree-load!
                      :message-tree
