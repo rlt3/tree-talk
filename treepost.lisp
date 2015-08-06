@@ -1,31 +1,34 @@
 ;;; The `post office' of the tree -- treepost.
 
-(defun treepost (tree msg)
-    "Dispatch the message via its method."
-    (flatten
-        (funcall
-            (message-method msg)
-            tree
-            msg)))
+(defmethod post-send ((self message) object)
+    "Send the message to an object."
+    (handler-case
+        (apply #'funcall
+            (append (list (message-title self) object self)
+                    (message-body self)))
+        (condition (e) ())))
 
 (defun post-to-leaf (message leaf)
     "Message the leaf."
-    (message-send message (leaf-root leaf)))
+    (post-send message (leaf-root leaf)))
 
 (defun post-to-branch (message branch)
     "Message the leaves of this branch."
     (message-stamp! 'recipient message branch)
-    (branch-each-leaf branch 
-        (lambda (leaf) 
-            (post-to-leaf message leaf))))
+        (branch-each-leaf branch 
+                         (lambda (leaf) 
+                             (post-to-leaf message leaf))))
 
 (defun post-to-branch-recursive (message branch)
     "Send a message to a tree from a branch recursively."
-    (append 
-        (post-to-branch message branch)
-        (branch-each-child branch
-            (lambda (child) 
-                (post-to-branch-recursive message child)))))
+    (append (post-to-branch message branch)
+            (branch-each-child branch
+                              (lambda (child) 
+                                  (post-to-branch-recursive message child)))))
+
+(defun treepost (tree msg)
+    "Dispatch the message via its method."
+    (flatten (funcall (message-method msg) tree msg)))
 
 ;; Methods in which we send our messages.
 
@@ -44,24 +47,13 @@
 (defun post-command (tree message)
     "A branch messages its children."
     (branch-each-child (message-author message)
-        (lambda (child) 
-            (post-to-branch message child))))
+                       (lambda (child) 
+                           (post-to-branch message child))))
 
-;; Procedures which compose the responses as messages using the methods above.
-
-(defun response-broadcast (old-message title body)
-    "Assemble the message for post-broadcast."
-    (make-message (message-recipient old-message) title body #'post-broadcast))
-
-(defun response-reply (old-message title body)
-    "Assemble the message for post-reply."
-    (make-message (message-recipient old-message) title body #'post-reply
-        :recipient (message-author old-message)))
-
-(defun response-think (old-message title body)
-    "Assemble the message for post-think."
-    (make-message (message-recipient old-message) title body #'post-think))
-
-(defun response-command (old-message title body)
-    "Assemble the message for post-command."
-    (make-message (message-recipient old-message) title body #'post-command))
+(defun response (method old-message title body)
+    "Create a response to the old message sent by a method."
+    (apply #'make-message
+           (append (list (message-recipient old-message) title body method)
+                   (cond ((eq method #'post-reply) 
+                             (list :recipient (message-author old-message))
+                         (t '()))))))

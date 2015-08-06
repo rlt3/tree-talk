@@ -25,11 +25,10 @@
     environment vars. Not tied to constructor so that our object can get 
     reloaded dynamically."
     (load (concatenate 'string "scripts/" (leaf-filename self)))
-    (setf 
-        (slot-value self 'object) 
-        (apply #'make-instance 
-            (leaf-class-sym self)
-            (leaf-env-vars self))))
+    (setf (slot-value self 'object) 
+          (apply #'make-instance 
+                (leaf-class-sym self)
+                (leaf-env-vars self))))
 
 (defmethod leaf-serialize ((self leaf))
     "Export lists and reload by applying those lists to make-leaf."

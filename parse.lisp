@@ -12,9 +12,7 @@
     "Call a procedure on every element on one side of the object."
     (if (not (car (funcall side form)))
         ()
-        (mapcar
-            procedure
-            (funcall side form))))
+        (mapcar procedure (funcall side form))))
 
 (defun parse-each-child (form procedure)
     "For each of the children do a procedure."

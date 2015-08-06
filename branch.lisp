@@ -14,9 +14,7 @@
 
 (defmethod branch-each-side ((self branch) side procedure)
     "Do the procedure for a deviant of the branch."
-    (mapcar
-        procedure
-        (funcall side self)))
+    (mapcar procedure (funcall side self)))
 
 (defmethod branch-each-child ((self branch) procedure)
     "Do the procedure for each child of the branch."
@@ -28,9 +26,8 @@
 
 (defmethod branch-add-leaf! ((self branch) leaf)
     "Add a leaf to the branch. The leaf is appended to the end."
-    (setf 
-        (slot-value self 'leaves)
-        (append (branch-leaves self) (list leaf))))
+    (setf (slot-value self 'leaves)
+          (append (branch-leaves self) (list leaf))))
 
 (defmethod branch-load! ((self branch))
     "Load the leaves of an branch."

@@ -1,6 +1,6 @@
 (defpackage :tree-talk
-    (:use :common-lisp)
-    (:export :make-tree :tree-load! :message-tree :message-tree-list))
+            (:use :common-lisp)
+            (:export :make-tree :tree-load! :message-tree :message-tree-list))
 
 (in-package :tree-talk)
 
@@ -20,15 +20,12 @@
 
 (defun message-tree (tree title &rest body)
     "The entry point to message a tree."
-    (treepost 
-        tree
-        (make-message tree title body #'post-broadcast)))
+    (treepost tree (make-message tree title body #'post-broadcast)))
 
 (defun message-tree-list (tree message-list)
     "Send a list of messages to the tree."
-    (mapcar 
-        (lambda (msg) 
-            (treepost tree msg)) 
-        message-list))
+    (mapcar (lambda (msg) 
+                (treepost tree msg)) 
+            message-list))
 
 (load "macros.lisp")

@@ -15,8 +15,8 @@
         (list
             (list
                 (list 
-                      '("draw.lisp" draw (:x 10 :y 15))
                       '("debug.lisp" deboog ())
+                      '("draw.lisp" draw (:x 10 :y 15))
                       '("collision.lisp" collision ()))
                 (list 
                     (list 
