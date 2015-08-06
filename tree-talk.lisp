@@ -1,24 +1,10 @@
 (defpackage :tree-talk
-            (:use :common-lisp)
-            (:export :self
-                     :handler
-                     :handle-message
-                     :helper
-                     :property
-                     :property-set!
-                     :think
-                     :reply
-                     :broadcast
-                     :command
-                     :make-tree
-                     :tree-load!
-                     :message-tree
-                     :message-tree-list))
+    (:use :common-lisp)
+    (:export :make-tree :tree-load! :message-tree :message-tree-list))
 
 (in-package :tree-talk)
 
 (load "utilities.lisp")
-(load "macros.lisp")
 (load "parse.lisp")
 (load "leaf.lisp")
 (load "branch.lisp")
@@ -44,3 +30,5 @@
         (lambda (msg) 
             (treepost tree msg)) 
         message-list))
+
+(load "macros.lisp")

@@ -1,3 +1,6 @@
+(in-package :cl-user)
+(use-package :tree-talk)
+
 (defmacro handler (name super-list property-list)
     "A wrapper for classes so we can know the class name."
     `(defclass ,name ,super-list
@@ -11,8 +14,6 @@
                     (slot-value self sym))
                (property-set! (sym value)
                     (setf (slot-value self sym) value))
-               (help (procedure &rest data)
-                    (apply #'funcall (append (procedure self) data)))
                (think (title &rest data) 
                     (response-think msg title data))
                (reply (title &rest data) 
