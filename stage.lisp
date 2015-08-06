@@ -1,7 +1,17 @@
 (load "tree-talk.lisp")
+(load "macros.lisp")
 
 (in-package :cl-user)
 (use-package :tree-talk)
+
+(defun keeper ()
+    (let ((files nil))
+        (lambda (add)
+            (setf files (cons add files))
+            files)))
+
+(defun keeper-closure (add)
+    (funcall (keeper) add))
 
 (defun me (macro)
     (macroexpand-1 macro))

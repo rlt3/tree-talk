@@ -19,22 +19,23 @@
                          (lambda (leaf) 
                              (post-to-leaf message leaf))))
 
-(defun post-to-branch-recursive (message branch)
+(defun post-to-tree (message branch)
     "Send a message to a tree from a branch recursively."
     (append (post-to-branch message branch)
             (branch-each-child branch
                               (lambda (child) 
-                                  (post-to-branch-recursive message child)))))
+                                  (post-to-tree message child)))))
 
 (defun treepost (tree msg)
     "Dispatch the message via its method."
-    (flatten (funcall (message-method msg) tree msg)))
+    (remove-if #'not-messagep?
+              (flatten (funcall (message-method msg) tree msg))))
 
 ;; Methods in which we send our messages.
 
 (defun post-broadcast (tree message)
     "Send a message to the entire tree."
-    (post-to-branch-recursive message tree))
+    (post-to-tree message tree))
 
 (defun post-think (tree message)
     "A leaf messages the other leaves on its branch."
@@ -50,7 +51,9 @@
                        (lambda (child) 
                            (post-to-branch message child))))
 
-(defun response (method old-message title body)
+;; Create the responses, with stamps appended determined by its method
+
+(defun make-response (method old-message title body)
     "Create a response to the old message sent by a method."
     (apply #'make-message
            (append (list (message-recipient old-message) title body method)

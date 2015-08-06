@@ -1,6 +1,6 @@
 (defpackage :tree-talk
             (:use :common-lisp)
-            (:export :make-tree :tree-load! :message-tree :message-tree-list))
+            (:export :make-tree :tree-load! :tree-message :tree-message-list))
 
 (in-package :tree-talk)
 
@@ -18,14 +18,12 @@
 ;       * How do we handle threading? Per message or per message list? Is our
 ;       data structure thread-safe?
 
-(defun message-tree (tree title &rest body)
+(defun tree-message (tree title &rest body)
     "The entry point to message a tree."
     (treepost tree (make-message tree title body #'post-broadcast)))
 
-(defun message-tree-list (tree message-list)
+(defun tree-message-list (tree message-list)
     "Send a list of messages to the tree."
     (mapcar (lambda (msg) 
                 (treepost tree msg)) 
             message-list))
-
-(load "macros.lisp")
