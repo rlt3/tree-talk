@@ -1,26 +1,54 @@
 ### A different take on the object model
 
+## What's the down and dirty?
+
+I'm not a biologist, but I don't think cells operate by just reaching into
+another cell with 'getters' and 'setters' and messing with information. They
+communicate. They talk to each other. 
+
+And objects just don't talk to each other in programming.
+
+This project is my vision of what I understood 'object-oriented' and 'message
+passing' to be before I learned object-oriented programming:
+
+* An object acts alone and in an entirely insulated environment. 
+* An object only acts by the messages it receives.
+* An object may act on a message by sending a response (which is yet another message) or it may do 
+everything internally without response.
+
 ## Why can't objects just talk to each other?
 
 I was making a game and I wanted a monster to track the player through a
-dungeon room. Why couldn't the monster just "hear" the player's movements? 
+dungeon room. I kept having a bunch of circular dependency issues with the
+player being an entity and the monster being and entity and blah blah blah. 
+
+I knew the solution -- just use yet another class to interface between the two.
+But why couldn't the monster just "hear" the player's movements? 
 
 If I'm in the room with someone, I can hear and see them moving. That person is
 communicating their movements to me without ever having to explicity say
 anything to me personally. If they start to move too closely I can get out of
 the way.
 
-Why can't the monster and player do the same? This project is my solution to
-that question.
+Why can't the monster and player do the same? I have been working on an 
+answer for a long time.
+
+I tried doing [virtual methods and templates in C++](https://github.com/rlt3/Messaging "c++ mess"). 
+Before that (and before I realized I was ever trying to solve this problem) [I was
+using PHP in a similar way.](https://github.com/rlt3/Stream "sphagetti php")
+
+I think using Lisp allowed me to get right to the fundamentals.
 
 ## How do they talk?
 
 Before I explain how they talk, I want to explain the structure of the project.
-Right now, the core data structure is a tree. Each node on this tree represents
-an object. I call these nodes branches.
+Right now, the core data structure is a tree. I am using a different definition
+of leaves and nodes.
 
-Each branch has any number of components (like an entity-component system) that
-define that branch. I call those components leaves.
+Each node on this tree represents an object. I call these nodes branches.
+
+Each branch has any number of properties (like an entity-component system) that
+define that branch. I call those properties leaves.
 
 Each branch has any number of leaves which define it. And each branch also has
 any number of children.
@@ -29,65 +57,63 @@ That means a tree is simply a collection of branches.
 
 ## That's cool, but how do they talk?
 
-Since each branch is defined by its leaves (rather, each object is defined by 
-its components), the leaves do all of the work.
-
-At its very core, the leaf is an object which has methods. The methods it has
-are the messages it receives.
+Since this is an object system, a leaf is an object which has methods. The
+methods it has are the messages it receives.
 
 For example, the player mashes the up-arrow on their keyboard. It produces a
 message that looks something like this:
 
     (message 'input 'up)
 
-As an example, let's say we have a leaf that looks like this:
+We might have a leaf that looks like this:
 
-    (handle-message input (direction)
+    (handle-message input (direction) input-leaf
         "Translate the player's input to our player object."
         (think 'move-towards (input->coordinates direction))
 
-The "think" procedure tells Tree-Talk that we want that message to be internal.
-In other words, "think" tells the leaf to message the other leaves of its 
-branch.
+The "think" procedure tells Tree-Talk that we want that message to be internal
+and messages the other leaves on that branch. In other words, it is talking to
+itself.
 
 Let's take this example further and look at another leaf:
 
-    (handle-message move-towards (coordinates)
+    (handle-message move-towards (coordinates) movement-leaf
         "Move towards destination every update."
-        (setf (property 'destination) coordinates))
+        (property-set! 'destination coordinates))
 
-    (handle-message update (dt)
+    (handle-message update (dt) movement-leaf
         "Move the object and broadcast our location."
         (move-delta dt)
-        (broadcast 'movement (property 'location)))
+        (say 'movement (property 'location)))
 
 This leaf accepted the 'move-towards message and set its destination. Then at
-every 'update it moves and then broadcasts its current location.
+every 'update it moves and then tells its current location to the other
+branches. That's how I might handle collision.
 
 ## What are the ways you can send messages?
 
-Right now there are just four ways:
+Right now there are just five ways:
 
+* Say - Send a message to a branch's siblings.
+* Reply - Send a message directly to the author of the message.
+* Think - Send a message internally to the other leaves on a branch.
+* Command - Send a message to a branch's children.
 * Broadcast - Send a message to the entire tree.
-* Think - Send a message internally to the other leaves on its branch.
-* Reply - Send a message directly to the author of the message it received.
-* Command - Send a message to its branch's children.
 
-## How do I use this?
+## How do I mess around with this?
 
-Just clone the repo and pop "tree-talk.lisp" into your interpreter. If you want
-to play around `treepost` is the procedure you're looking for. `(treepost 
-'update)` will spit out some information.
+I have a general structure and some scripts already defined in "stage.lisp".
+You can get started right away by loading that into your interpreter and 
+calling `(tree-message *tree* 'update)`.
 
-`(treepost 'start)` will return a message. The entire point of the tree is that
-you send messages in and receive responses, which are just messages you can put
-right back into the tree.
+`(tree-message *tree* 'start)` will return a message. The entire point of the
+tree is that you send messages in and receive responses, which are just
+messages you can put right back into the tree.
 
 ## The future
 
-I have plans to make this a library or standalone program extensible by Common
-Lisp. Probably both.
+Though I am using this for games, I think the general idea is bigger than
+games and the reason why I want to share it with everyone.
 
-I am using Embeddable Common Lisp as my interpreter as I hope to embed this in
-a C program to use as my object model for some games. I think this idea can be
-really useful outside of games, though.
+I am attempting to make a [C Library which can interface with objects
+written in many different languages](https://github.com/rlt3/tree-talk-c "tree-talk-c").

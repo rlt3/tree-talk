@@ -20,21 +20,10 @@
     (   object :reader leaf-root
                :initform ())))
 
-(defun in-list? (item l)
-    (if (find item l) t ()))
-
-(defmethod leaf-load-file! ((self leaf))
-    (let ((files ()))
-        (if (in-list? (leaf-filename self) files)
-            (progn (setq files (append files (leaf-filename self)))
-                   (load (concatenate 'string "scripts/" (leaf-filename self))))
-            ())))
-
 (defmethod leaf-load! ((self leaf))
     "Load our script file if needed and then load the script with the 
     environment vars. Not tied to constructor so that our object can get 
     reloaded dynamically."
-    ;(leaf-load-file! self)
     (load (concatenate 'string "scripts/" (leaf-filename self)))
     (setf (slot-value self 'object) 
           (apply #'make-instance 
