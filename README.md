@@ -36,7 +36,7 @@ communicating their movements to me without ever having to explicity say
 anything to me personally. If they start to move too closely I can get out of
 the way.
 
-With Tree-Talk, the player and monster can just talk to each other and figuring
+With Tree-Talk, the player and monster can just talk to each other and figure
 all this out amongst themselves.
 
 ## How do they talk?
@@ -78,11 +78,11 @@ itself.
 Let's take this example further and look at another leaf:
 
     (handle-message move-towards (coordinates) movement-leaf
-        "Move towards destination every update."
+        "Set the destination."
         (property-set! 'destination coordinates))
 
     (handle-message update (dt) movement-leaf
-        "Move the object and broadcast our location."
+        "Move with delta time and let everyone know our location every update."
         (move-delta dt)
         (say 'movement (property 'location)))
 
