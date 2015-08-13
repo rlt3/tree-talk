@@ -16,6 +16,12 @@ passing' to be before I learned object-oriented programming:
 * An object may act on a message by sending a response (which is yet another message) or it may do 
 everything internally without response.
 
+I think using Lisp allowed me to get right to the fundamentals.
+
+I tried doing [virtual methods and templates in C++](https://github.com/rlt3/Messaging/blob/master/src/messageable.hpp "c++ mess"). 
+Before that (and before I realized I was ever trying to solve this problem) [I was
+using PHP in a similar way.](https://github.com/rlt3/Stream "sphagetti php")
+
 ## Why can't objects just talk to each other?
 
 I was making a game and I wanted a monster to track the player through a
@@ -30,14 +36,8 @@ communicating their movements to me without ever having to explicity say
 anything to me personally. If they start to move too closely I can get out of
 the way.
 
-Why can't the monster and player do the same? I have been working on an 
-answer for a long time.
-
-I tried doing [virtual methods and templates in C++](https://github.com/rlt3/Messaging "c++ mess"). 
-Before that (and before I realized I was ever trying to solve this problem) [I was
-using PHP in a similar way.](https://github.com/rlt3/Stream "sphagetti php")
-
-I think using Lisp allowed me to get right to the fundamentals.
+With Tree-Talk, the player and monster can just talk to each other and figuring
+all this out amongst themselves.
 
 ## How do they talk?
 
