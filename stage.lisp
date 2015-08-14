@@ -13,17 +13,14 @@
         (list
             (list
                 (list 
-                      '("debug.lisp" deboog ())
-                      '("draw.lisp" draw (:x 10 :y 15))
-                      '("collision.lisp" collision ()))
+                      '("input.lisp" input ())
+                      '("draw.lisp" draw (:x 10 :y 15)))
                 (list 
                     (list 
-                        (list '("collision.lisp" collision ())
-                              '("draw.lisp" draw (:x 800 :y 600)))
+                        (list '("draw.lisp" draw (:x 800 :y 600)))
                         (list ()))))
             (list
-                (list '("collision.lisp" collision ())
-                      '("draw.lisp" draw (:x 40 :y 80)))
+                (list '("draw.lisp" draw (:x 40 :y 80)))
                 (list ())))))
 
 (defvar *tree* (make-tree *tree-structure*))

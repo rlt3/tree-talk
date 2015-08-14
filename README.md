@@ -16,7 +16,16 @@ passing' to be before I learned object-oriented programming:
 * An object may act on a message by sending a response (which is yet another message) or it may do 
 everything internally without response.
 
-I think using Lisp allowed me to get right to the fundamentals.
+Objects in Tree-Talk are put into a tree and operate purely on messages.
+Having a tree allows for clearly defined ways of sending messages -- "say",
+"broadcast", "think".  These procedures define who "hears" a message (its 
+scope).
+
+Each object's state is hidden from one another. There are no public, protected,
+or private methods -- just a single entry-point for taking in a message.
+
+I've been working on this problem for a long time and want to know if I'm hot
+or cold and am open to help.
 
 I tried doing [virtual methods and templates in C++](https://github.com/rlt3/Messaging/blob/master/src/messageable.hpp "c++ mess"). 
 Before that (and before I realized I was ever trying to solve this problem) [I was
@@ -102,13 +111,27 @@ Right now there are just five ways:
 
 ## How do I mess around with this?
 
-I have a general structure and some scripts already defined in "stage.lisp".
-You can get started right away by loading that into your interpreter and 
-calling `(tree-message *tree* 'update)`.
+I already have some toy scripts in the repo. I have a tree structure defined
+in `stage.lisp`. You can get started right away by loading that into your
+interpreter and calling `(tree-message *tree* 'update)`.
 
-`(tree-message *tree* 'start)` will return a message. The entire point of the
-tree is that you send messages in and receive responses, which are just
+`(tree-message *tree* 'input 'up)` will return a message. The entire point of
+the tree is that you send messages in and receive responses, which are just
 messages you can put right back into the tree.
+
+    > (tree-message *tree* 'update)
+    Drawing at (10, 15)
+    NIL
+
+    > (tree-message *tree* 'input 'up)
+    (#<a TREE-TALK::MESSAGE>)
+
+    > (tree-message-list *tree* (tree-message *tree* 'input 'up))
+    (NIL)
+
+    > (tree-message *tree* 'update)
+    Drawing at (10, 16)
+    NIL
 
 ## The future
 
